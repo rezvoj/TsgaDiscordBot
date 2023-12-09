@@ -161,6 +161,50 @@ class DatabaseTests(unittest.TestCase):
             self.assertIsNone(result)
 
 
+    def testListForUser(self):
+        database.initDB(self.connection)
+        with database.transaction(self.connection) as cursor:
+            cursor.execute("INSERT INTO Streamer (id, status) VALUES (?, ?)", (111, 0))
+            cursor.execute("INSERT INTO Streamer (id, status) VALUES (?, ?)", (222, 0))
+            cursor.execute("INSERT INTO WatchedStatus (streamerId, userId, status) VALUES (?, ?, ?)", (111, 12345, 1))
+            cursor.execute("INSERT INTO WatchedStatus (streamerId, userId, status) VALUES (?, ?, ?)", (111, 12345, 2))
+            cursor.execute("INSERT INTO WatchedStatus (streamerId, userId, status) VALUES (?, ?, ?)", (222, 12345, 3))
+            cursor.execute("INSERT INTO WatchedStatus (streamerId, userId, status) VALUES (?, ?, ?)", (222, 67890, 4))
+        result = database.listForUser(self.connection, 12345)
+        expectedResult = {"111": ["1", "2"], "222": ["3"]}
+        self.assertEqual(result, expectedResult)
+        result = database.listForUser(self.connection, 12345, 111)
+        expectedResult = {"111": ["1", "2"]}
+        self.assertEqual(result, expectedResult)
+        result = database.listForUser(self.connection, 99999)
+        expectedResult = {}
+        self.assertEqual(result, expectedResult)
+        result = database.listForUser(self.connection, 67890, 111)
+        expectedResult = {}
+        self.assertEqual(result, expectedResult)
+
+
+    def testGetUsersForStreamerStatus(self):
+        database.initDB(self.connection)
+        with database.transaction(self.connection) as cursor:
+            cursor.execute("INSERT INTO Streamer (id, status) VALUES (?, ?)", (111, 0))
+            cursor.execute("INSERT INTO Streamer (id, status) VALUES (?, ?)", (222, 0))
+            cursor.execute("INSERT INTO WatchedStatus (streamerId, userId, status) VALUES (?, ?, ?)", (111, 12345, 1))
+            cursor.execute("INSERT INTO WatchedStatus (streamerId, userId, status) VALUES (?, ?, ?)", (111, 67890, 1))
+            cursor.execute("INSERT INTO WatchedStatus (streamerId, userId, status) VALUES (?, ?, ?)", (111, 55555, 2))
+            cursor.execute("INSERT INTO WatchedStatus (streamerId, userId, status) VALUES (?, ?, ?)", (222, 12345, 2))
+            cursor.execute("INSERT INTO WatchedStatus (streamerId, userId, status) VALUES (?, ?, ?)", (222, 67890, 3))
+        result = database.getUsersForStreamerStatus(self.connection, 111, 1)
+        expectedResult = ["12345", "67890"]
+        self.assertEqual(result, expectedResult)
+        result = database.getUsersForStreamerStatus(self.connection, 111, 2)
+        expectedResult = ["55555"]
+        self.assertEqual(result, expectedResult)
+        result = database.getUsersForStreamerStatus(self.connection, 111, 3)
+        expectedResult = []
+        self.assertEqual(result, expectedResult)
+
+
 
 if __name__ == '__main__':
     unittest.main()
