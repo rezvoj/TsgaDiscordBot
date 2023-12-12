@@ -34,3 +34,67 @@ def getStreamInfo(clientId, accessToken, userId):
             return streamData[0]
         return None
     raise Exception(f"Error: {response.status_code} - {response.text}")
+
+
+def getGameId(clientId, accessToken, gameName):
+    url = 'https://api.twitch.tv/helix/games'
+    headers = {
+        'Client-ID': clientId,
+        'Authorization': f'Bearer {accessToken}'
+    }
+    params = {'name': gameName}    
+    response = requests.get(url, headers=headers, params=params)
+    if response.status_code == 200:
+        gameData = response.json()['data']
+        if gameData:
+            return gameData[0]['id']
+        return None
+    raise Exception(f"Error: {response.status_code} - {response.text}")
+
+
+def getGameName(clientId, accessToken, gameId):
+    url = 'https://api.twitch.tv/helix/games'
+    headers = {
+        'Client-ID': clientId,
+        'Authorization': f'Bearer {accessToken}'
+    }
+    params = {'id': gameId}
+    response = requests.get(url, headers=headers, params=params)
+    if response.status_code == 200:
+        gameData = response.json()['data']
+        if gameData:
+            return gameData[0]['name']
+        return None
+    raise Exception(f"Error: {response.status_code} - {response.text}")
+
+
+def getStreamerId(clientId, accessToken, streamerLogin):
+    url = 'https://api.twitch.tv/helix/users'
+    headers = {
+        'Client-ID': clientId,
+        'Authorization': f'Bearer {accessToken}'
+    }
+    params = {'login': streamerLogin}
+    response = requests.get(url, headers=headers, params=params)
+    if response.status_code == 200:
+        userData = response.json()['data']
+        if userData:
+            return userData[0]['id']
+        return None
+    raise Exception(f"Error: {response.status_code} - {response.text}")
+
+
+def getStreamerName(clientId, accessToken, streamerId):
+    url = 'https://api.twitch.tv/helix/users'
+    headers = {
+        'Client-ID': clientId,
+        'Authorization': f'Bearer {accessToken}'
+    }
+    params = {'id': streamerId}
+    response = requests.get(url, headers=headers, params=params)
+    if response.status_code == 200:
+        userData = response.json()['data']
+        if userData:
+            return userData[0]['login']
+        return None
+    raise Exception(f"Error: {response.status_code} - {response.text}")
