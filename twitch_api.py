@@ -1,4 +1,4 @@
-import requests, tokens, datetime, threading
+import requests, tokens, datetime
 
 def getAccessToken(clientId, clientSecret):
     url = 'https://id.twitch.tv/oauth2/token'
