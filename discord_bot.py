@@ -1,4 +1,4 @@
-import discord, datetime, database, twitch_api, asyncio, tokens
+import discord, datetime, database, update, threading, twitch_api, asyncio, tokens
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -11,6 +11,7 @@ dbConnection = database.getConnection("data.db")
 @client.event
 async def on_ready():
     print(f"Bot Ready {datetime.datetime.now()}")
+    threading.Thread(target=update.run, args=(client, )).start()
 
 
 async def getStreamerId(message: discord.Message, streamerName: str):

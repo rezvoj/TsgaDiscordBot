@@ -1,5 +1,7 @@
 import discord, database, sqlite3, datetime, twitch_api, asyncio, time
 
+updateDelay = 30
+
 
 
 def sendToUser(dcClient: discord.Client, userId, message):
@@ -36,4 +38,4 @@ def run(dcClient: discord.Client):
     with database.getConnection("data.db") as dbConnection:
         while True:
             update(dcClient, dbConnection)
-            time.sleep(30)
+            time.sleep(updateDelay)
